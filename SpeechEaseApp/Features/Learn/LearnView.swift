@@ -90,17 +90,7 @@ struct LearnView: View {
                         let centerX = geo.size.width / 2
                         
                         ZStack {
-                            // Scenic Theme Background (framing the curves)
-                            PathBackgroundView(
-                                totalHeight: pathHeight,
-                                centerX: centerX,
-                                spacing: spacing,
-                                color: activeTopicColor,
-                                theme: activePathTheme,
-                                lessonCount: lessonsList.count
-                            )
-                            
-                            // Lesson Nodes (floating on scenery in wavy format)
+                            // Lesson Nodes (floating on white background in wavy format)
                             ForEach(Array(lessonsList.enumerated()), id: \.element.id) { index, lesson in
                                 let isUnlocked = manager.isLessonUnlocked(id: lesson.id, allLessons: lessonsList)
                                 let isCompleted = manager.isLessonCompleted(id: lesson.id)
@@ -216,18 +206,7 @@ struct LearnView: View {
         let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
         return colorForTopicType(activeType)
     }
-    
-    private var activePathTheme: PathTheme {
-        let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
-        switch activeType {
-        case .structure: return .forest
-        case .conciseness: return .autumn
-        case .nonverbal: return .energy
-        case .tone: return .mystic
-        case .storytelling: return .ocean
-        case .audience: return .frost
-        }
-    }
+
     
     private func colorForTopicType(_ type: TopicType) -> Color {
         switch type {
