@@ -12,7 +12,7 @@ struct LearnView: View {
     @State private var showHeartsRefill = false
     @State private var selectedLesson: Lesson? = nil
     
-    private let spacing: CGFloat = 130
+    private let spacing: CGFloat = 100
     
     var body: some View {
         VStack(spacing: 0) {
@@ -197,8 +197,8 @@ struct LearnView: View {
         let startY = totalHeight - 80
         let y = startY - CGFloat(index) * spacing
         let indexLike = (totalHeight - 80 - y) / spacing
-        let amplitude: CGFloat = 65
-        let xOffset = amplitude * sin(Double(indexLike) * 1.8)
+        let amplitude: CGFloat = 55
+        let xOffset = amplitude * sin(Double(indexLike) * 0.8)
         return CGPoint(x: centerX + xOffset, y: y)
     }
     
