@@ -28,6 +28,7 @@ class LearningManager: ObservableObject {
     
     init() {
         loadState()
+        checkStreakOnLaunch()
     }
     
     func loadState() {
@@ -124,6 +125,51 @@ class LearningManager: ObservableObject {
         }
     }
     
+    // Switch active learning topic
+    func setActiveTopic(id: String) {
+        withAnimation {
+            activeTopicId = id
+            saveState()
+        }
+    }
+    
+    // Deduct a heart when a quiz question is answered incorrectly
+    func deductHeart() {
+        withAnimation {
+            if hearts > 0 {
+                hearts -= 1
+                saveState()
+            }
+        }
+    }
+    
+    // Refill hearts to max (5) using gems (cost: 100 gems)
+    func refillHeartsWithGems() -> Bool {
+        if gems >= 100 && hearts < 5 {
+            withAnimation {
+                gems -= 100
+                hearts = 5
+                saveState()
+            }
+            return true
+        }
+        return false
+    }
+    
+    // Verify streak counts (e.g. check on launch or view load if streak has broken)
+    func checkStreakOnLaunch() {
+        guard let lastDate = lastPracticeDate else { return }
+        let calendar = Calendar.current
+        
+        // If the last practice date was not today and not yesterday, the streak is broken
+        if !calendar.isDateInToday(lastDate) && !calendar.isDateInYesterday(lastDate) {
+            withAnimation {
+                streakCount = 0
+                saveState()
+            }
+        }
+    }
+    
     // Streak logic
     private func updateStreak() {
         let calendar = Calendar.current
@@ -158,8 +204,12 @@ class LearningManager: ObservableObject {
             return concisenessLessons
         case .nonverbal:
             return nonverbalLessons
-        default:
-            return []
+        case .tone:
+            return toneLessons
+        case .storytelling:
+            return storytellingLessons
+        case .audience:
+            return audienceLessons
         }
     }
 }
