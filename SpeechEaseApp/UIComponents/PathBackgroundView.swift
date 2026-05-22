@@ -11,131 +11,112 @@ enum PathTheme {
 
 struct PathBackgroundView: View {
     let totalHeight: CGFloat
+    let centerX: CGFloat
+    let spacing: CGFloat
     let color: Color
     let theme: PathTheme
+    let lessonCount: Int
     
     var body: some View {
-        GeometryReader { proxy in
-            let width = proxy.size.width
-            let baseDensity: CGFloat = theme == .frost ? 55 : 75
-            let density: Int = max(3, Int(totalHeight / baseDensity))
-            
-            ZStack {
-                ForEach(0..<density, id: \.self) { index in
-                    let itemType = index % 5
-                    let yPos = CGFloat(index) * baseDensity + CGFloat(index * 2 % 35)
-                    let side = index % 2 == 0 ? "left" : "right"
-                    let xOffset = CGFloat(20 + (index * 17 % 80))
-                    let xPos = side == "left" ? xOffset : (width - xOffset)
-                    let scale = CGFloat(0.8 + Double(index % 4) * 0.2)
-                    let randomRotation = Double(index * 7 % 60 - 30)
-                    
-                    Group {
-                        switch theme {
-                        case .forest:
-                            if itemType == 0 {
-                                Image(systemName: "tree.fill")
-                                    .foregroundStyle(color.opacity(0.8))
-                                    .scaleEffect(1.2)
-                            } else if itemType == 1 {
-                                Image(systemName: "laurel.leading")
-                                    .foregroundStyle(color.opacity(0.7))
-                                    .rotationEffect(.degrees(side == "left" ? -45 : 45))
-                                    .scaleEffect(1.4)
-                            } else {
-                                Image(systemName: "leaf.fill")
-                                    .foregroundStyle(color.opacity(0.55))
-                                    .rotationEffect(.degrees(randomRotation))
-                            }
-                            
-                        case .autumn:
-                            if itemType == 0 {
-                                Image(systemName: "sun.max.fill")
-                                    .foregroundStyle(.yellow.opacity(0.75))
-                            } else if itemType == 1 {
-                                Image(systemName: "wind")
-                                    .foregroundStyle(.gray.opacity(0.25))
-                                    .scaleEffect(1.3)
-                            } else {
-                                Image(systemName: "leaf.fill")
-                                    .foregroundStyle(index % 3 == 0 ? .orange : (index % 3 == 1 ? .red : .brown))
-                                    .rotationEffect(.degrees(Double(index * 25 % 360)))
-                            }
+        let startY = totalHeight - 80
+        let amplitude: CGFloat = 65
+        
+        ZStack {
+            ForEach(0..<lessonCount, id: \.self) { index in
+                // Place scenery in the curve valleys (halfway between nodes)
+                let itemIndex = Double(index) + 0.5
+                let y = startY - CGFloat(itemIndex) * spacing
+                let pathXOffset = amplitude * sin(itemIndex * 1.8)
+                
+                // If path curves right, place scenery on the left. If path curves left, place on the right.
+                // We use a margin of about 105pt from center to leave room for the path and nodes.
+                let sceneryX = pathXOffset > 0 ? (centerX - 105) : (centerX + 105)
+                
+                // Alternating scenery items
+                let itemType = index % 3
+                
+                Group {
+                    switch theme {
+                    case .forest:
+                        if itemType == 0 {
+                            Image(systemName: "tree.fill")
+                                .foregroundStyle(color.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "leaf.fill")
+                                .foregroundStyle(color.opacity(0.6))
+                                .rotationEffect(.degrees(45))
+                        } else {
+                            Image(systemName: "tent.fill")
+                                .foregroundStyle(color.opacity(0.75))
+                        }
                         
-                        case .energy:
-                            if itemType == 0 {
-                                Image(systemName: "flame.fill")
-                                    .foregroundStyle(.orange.opacity(0.85))
-                            } else if itemType == 1 {
-                                Image(systemName: "bolt.fill")
-                                    .foregroundStyle(.yellow.opacity(0.85))
-                            } else if itemType == 2 {
-                                Image(systemName: "heart.fill")
-                                    .foregroundStyle(Color.red.opacity(0.75))
-                            } else {
-                                Image(systemName: "triangle.fill")
-                                    .foregroundStyle(color.opacity(0.45))
-                                    .scaleEffect(0.6)
-                                    .rotationEffect(.degrees(Double(index * 45 % 360)))
-                            }
-
-                        case .mystic:
-                            if itemType == 0 {
-                                Image(systemName: "suit.diamond.fill")
-                                    .foregroundStyle(color.opacity(0.75))
-                            } else if itemType == 1 {
-                                Image(systemName: "sparkles")
-                                    .foregroundStyle(.white.opacity(0.9))
-                            } else if itemType == 2 {
-                                Image(systemName: "camera.macro")
-                                    .foregroundStyle(Color.purple.opacity(0.65))
-                            } else {
-                                Image(systemName: "star.fill")
-                                    .foregroundStyle(.pink.opacity(0.55))
-                                    .scaleEffect(0.6)
-                            }
-                            
-                        case .ocean:
-                            if itemType == 0 {
-                                Image(systemName: "drop.fill")
-                                    .foregroundStyle(Color.blue.opacity(0.8))
-                            } else if itemType == 1 {
-                                Circle()
-                                    .stroke(Color.white.opacity(0.45), lineWidth: 1.5)
-                                    .frame(width: 16, height: 16)
-                            } else {
-                                Image(systemName: "water.waves")
-                                    .foregroundStyle(color.opacity(0.65))
-                            }
-
-                        case .frost:
-                            if itemType == 0 {
-                                Image(systemName: "snowflake")
-                                    .foregroundStyle(.cyan.opacity(0.85))
-                            } else if itemType == 1 {
-                                Image(systemName: "wind.snow")
-                                    .foregroundStyle(.white.opacity(0.45))
-                            } else {
-                                Image(systemName: "sparkle")
-                                    .foregroundStyle(.white.opacity(0.75))
-                            }
+                    case .autumn:
+                        if itemType == 0 {
+                            Image(systemName: "leaf.arrow.triangle.circlepath")
+                                .foregroundStyle(.orange.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "leaf.fill")
+                                .foregroundStyle(.red.opacity(0.75))
+                                .rotationEffect(.degrees(120))
+                        } else {
+                            Image(systemName: "sun.max.fill")
+                                .foregroundStyle(.yellow.opacity(0.75))
+                        }
+                        
+                    case .energy:
+                        if itemType == 0 {
+                            Image(systemName: "lightbulb.fill")
+                                .foregroundStyle(.yellow.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "bolt.fill")
+                                .foregroundStyle(.orange.opacity(0.85))
+                        } else {
+                            Image(systemName: "sparkles")
+                                .foregroundStyle(color.opacity(0.75))
+                        }
+                        
+                    case .mystic:
+                        if itemType == 0 {
+                            Image(systemName: "waveform.path")
+                                .foregroundStyle(color.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "music.note")
+                                .foregroundStyle(.pink.opacity(0.85))
+                        } else {
+                            Image(systemName: "speaker.wave.3.fill")
+                                .foregroundStyle(color.opacity(0.75))
+                        }
+                        
+                    case .ocean:
+                        if itemType == 0 {
+                            Image(systemName: "book.closed.fill")
+                                .foregroundStyle(color.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "wand.and.stars")
+                                .foregroundStyle(.yellow.opacity(0.85))
+                        } else {
+                            Image(systemName: "crown.fill")
+                                .foregroundStyle(color.opacity(0.75))
+                        }
+                        
+                    case .frost:
+                        if itemType == 0 {
+                            Image(systemName: "bubble.left.and.bubble.right.fill")
+                                .foregroundStyle(color.opacity(0.85))
+                        } else if itemType == 1 {
+                            Image(systemName: "quote.opening")
+                                .foregroundStyle(.cyan.opacity(0.75))
+                        } else {
+                            Image(systemName: "person.2.fill")
+                                .foregroundStyle(color.opacity(0.75))
                         }
                     }
-                    .font(.system(size: 32))
-                    .scaleEffect(scale)
-                    .shadow(color: color.opacity(0.15), radius: 3, x: 0, y: 3)
-                    .position(x: xPos, y: totalHeight - yPos)
                 }
+                .font(.system(size: 26, weight: .bold))
+                .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 2)
+                .position(x: sceneryX, y: y)
             }
         }
-        .frame(height: totalHeight)
         .allowsHitTesting(false)
     }
-}
-
-#Preview {
-    ScrollView {
-        PathBackgroundView(totalHeight: 600, color: .green, theme: .forest)
-    }
-    .background(Color.black.opacity(0.9))
 }

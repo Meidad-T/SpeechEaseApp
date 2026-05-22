@@ -5,6 +5,19 @@
 
 import SwiftUI
 
+/*
+ ==============================================================================
+ NOTE FOR THE DEVELOPMENT TEAM:
+ ------------------------------------------------------------------------------
+ This header view serves as a highly modular placeholder. To connect it to your
+ global application state (e.g. user profiles, global streak tracking, core data
+ state), you can:
+ 1. Replace `@ObservedObject var manager = LearningManager.shared` with:
+    - `@EnvironmentObject var userState: GlobalUserState`
+    - Or direct `@Binding` or standard parameters.
+ 2. Make sure you read from your global session parameters for crowns, streak, gems, and hearts.
+ ==============================================================================
+ */
 struct MetricsHeaderView: View {
     @ObservedObject var manager = LearningManager.shared
     var onSelectTopic: () -> Void
