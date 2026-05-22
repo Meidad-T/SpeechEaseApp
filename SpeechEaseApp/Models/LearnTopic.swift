@@ -5,8 +5,40 @@
 
 import SwiftUI
 
+enum TopicType: String, CaseIterable, Codable {
+    case structure = "structure"
+    case conciseness = "conciseness"
+    case nonverbal = "nonverbal"
+    case tone = "tone"
+    case storytelling = "storytelling"
+    case audience = "audience"
+    
+    var title: String {
+        switch self {
+        case .structure: return "Structure & Organization"
+        case .conciseness: return "Content & Conciseness"
+        case .nonverbal: return "Nonverbal Communication"
+        case .tone: return "Tone & Pitch"
+        case .storytelling: return "Storytelling"
+        case .audience: return "Audience Connection"
+        }
+    }
+    
+    var systemIcon: String {
+        switch self {
+        case .structure: return "rectangle.3.group"
+        case .conciseness: return "arrow.down.right.and.arrow.up.left"
+        case .nonverbal: return "figure.walk"
+        case .tone: return "waveform.path"
+        case .storytelling: return "book.fill"
+        case .audience: return "person.2.fill"
+        }
+    }
+}
+
 struct LearnTopic: Identifiable, Hashable {
-    let id = UUID()
+    let id: String
+    let type: TopicType
     let title: String
     let category: String
     let description: String
@@ -32,80 +64,92 @@ struct LearnTopic: Identifiable, Hashable {
 extension LearnTopic {
     static let sampleTopics: [LearnTopic] = [
         LearnTopic(
-            title: "Body Language",
-            category: "Physical Presence",
-            description: "Master hand gestures, posture, and eye contact to command the room.",
-            systemIcon: "figure.walk",
-            startColor: Color(red: 1.0, green: 0.35, blue: 0.37), // Coral
-            endColor: Color(red: 1.0, green: 0.55, blue: 0.40),
-            progress: 0.75,
-            scoreProgress: 0.90,
-            lessonsCount: 8,
-            completedLessons: 6,
-            isFavorited: true
-        ),
-        LearnTopic(
-            title: "Vocal Variety",
-            category: "Voice & Resonance",
-            description: "Control your pitch, volume, and resonance for dynamic delivery.",
-            systemIcon: "waveform.path",
-            startColor: Color(red: 0.48, green: 0.17, blue: 0.75), // Purple
-            endColor: Color(red: 0.65, green: 0.35, blue: 0.95),
-            progress: 0.40,
-            scoreProgress: 0.75,
-            lessonsCount: 10,
-            completedLessons: 4,
-            isFavorited: false
-        ),
-        LearnTopic(
-            title: "Pacing & Pauses",
-            category: "Speech Flow",
-            description: "Use the power of silence and control your speed to build tension.",
-            systemIcon: "timer",
-            startColor: Color(red: 0.0, green: 0.47, blue: 0.71), // Blue
-            endColor: Color(red: 0.20, green: 0.70, blue: 0.95),
-            progress: 0.60,
-            scoreProgress: 0.80,
-            lessonsCount: 5,
-            completedLessons: 3,
-            isFavorited: false
-        ),
-        LearnTopic(
-            title: "Stage Confidence",
-            category: "Mental Prep",
-            description: "Overcome stage fright and speak with calm, authentic authority.",
-            systemIcon: "bolt.fill",
-            startColor: Color(red: 0.18, green: 0.42, blue: 0.31), // Forest Green
-            endColor: Color(red: 0.35, green: 0.65, blue: 0.45),
-            progress: 0.80,
-            scoreProgress: 0.85,
-            lessonsCount: 5,
-            completedLessons: 4,
-            isFavorited: true
-        ),
-        LearnTopic(
-            title: "Speech Structure",
-            category: "Content Planning",
-            description: "Organize your hook, body points, and call to action effectively.",
+            id: "structure",
+            type: .structure,
+            title: "Structure & Organization",
+            category: "Structure & Organization",
+            description: "Ensure your message has a clear, logical flow with a strong introduction, an informative body, and a memorable conclusion.",
             systemIcon: "rectangle.3.group",
-            startColor: Color(red: 0.98, green: 0.52, blue: 0.0), // Amber/Orange
+            startColor: Color(red: 0.98, green: 0.52, blue: 0.0), // Orange/Amber
             endColor: Color(red: 1.0, green: 0.70, blue: 0.20),
-            progress: 0.20,
-            scoreProgress: 0.60,
-            lessonsCount: 5,
-            completedLessons: 1,
-            isFavorited: false
-        ),
-        LearnTopic(
-            title: "Audience Connection",
-            category: "Engagement",
-            description: "Read the room, handle tough Q&A sessions, and adapt on the fly.",
-            systemIcon: "person.2.fill",
-            startColor: Color(red: 0.05, green: 0.70, blue: 0.65), // Teal
-            endColor: Color(red: 0.20, green: 0.85, blue: 0.80),
             progress: 0.0,
             scoreProgress: 0.0,
-            lessonsCount: 6,
+            lessonsCount: 12,
+            completedLessons: 0,
+            isFavorited: false
+        ),
+        LearnTopic(
+            id: "conciseness",
+            type: .conciseness,
+            title: "Content & Conciseness",
+            category: "Content & Conciseness",
+            description: "Keep your facts accurate, focused, and free of unnecessary fluff. Speak meaningfully without overwhelming your listener.",
+            systemIcon: "arrow.down.right.and.arrow.up.left",
+            startColor: Color(red: 1.0, green: 0.35, blue: 0.37), // Coral/Red
+            endColor: Color(red: 1.0, green: 0.55, blue: 0.40),
+            progress: 0.0,
+            scoreProgress: 0.0,
+            lessonsCount: 12,
+            completedLessons: 0,
+            isFavorited: false
+        ),
+        LearnTopic(
+            id: "nonverbal",
+            type: .nonverbal,
+            title: "Nonverbal Communication",
+            category: "Nonverbal Communication",
+            description: "Maintain eye contact, adopt open posture, and use natural hand gestures to reinforce your credibility and convey warmth.",
+            systemIcon: "figure.walk",
+            startColor: Color(red: 0.48, green: 0.17, blue: 0.75), // Purple
+            endColor: Color(red: 0.65, green: 0.35, blue: 0.95),
+            progress: 0.0,
+            scoreProgress: 0.0,
+            lessonsCount: 12,
+            completedLessons: 0,
+            isFavorited: false
+        ),
+        LearnTopic(
+            id: "tone",
+            type: .tone,
+            title: "Tone & Pitch",
+            category: "Tone & Pitch",
+            description: "Be highly intentional about your vocal modulation. A steady, confident tone ensures your words resonate and builds trust.",
+            systemIcon: "waveform.path",
+            startColor: Color(red: 0.85, green: 0.15, blue: 0.45), // Pink/Magenta
+            endColor: Color(red: 0.95, green: 0.45, blue: 0.65),
+            progress: 0.0,
+            scoreProgress: 0.0,
+            lessonsCount: 12,
+            completedLessons: 0,
+            isFavorited: false
+        ),
+        LearnTopic(
+            id: "storytelling",
+            type: .storytelling,
+            title: "Storytelling",
+            category: "Storytelling",
+            description: "Transform complex information or resume points into relatable, engaging stories. This makes your ideas stick and keeps the audience's attention.",
+            systemIcon: "book.fill",
+            startColor: Color(red: 0.0, green: 0.47, blue: 0.71), // Ocean Blue
+            endColor: Color(red: 0.20, green: 0.70, blue: 0.95),
+            progress: 0.0,
+            scoreProgress: 0.0,
+            lessonsCount: 12,
+            completedLessons: 0,
+            isFavorited: false
+        ),
+        LearnTopic(
+            id: "audience",
+            type: .audience,
+            title: "Audience Connection",
+            category: "Audience Connection",
+            description: "Prioritize active listening and empathy. Frame your message around your listeners' needs and handle Q&A sessions with grace.",
+            systemIcon: "person.2.fill",
+            startColor: Color(red: 0.05, green: 0.55, blue: 0.40), // Forest Green/Teal
+            endColor: Color(red: 0.25, green: 0.75, blue: 0.55),
+            progress: 0.0,
+            scoreProgress: 0.0,
+            lessonsCount: 12,
             completedLessons: 0,
             isFavorited: false
         )
