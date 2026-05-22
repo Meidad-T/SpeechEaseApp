@@ -98,7 +98,6 @@ struct LearnView: View {
                                 let pos = positionForLesson(index: index, totalHeight: pathHeight, centerX: centerX)
                                 
                                 LessonNode(
-                                    lesson: lesson,
                                     isUnlocked: isUnlocked,
                                     isCompleted: isCompleted,
                                     isActive: isActive,

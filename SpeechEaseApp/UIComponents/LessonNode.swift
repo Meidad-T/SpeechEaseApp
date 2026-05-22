@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LessonNode: View {
-    let lesson: Lesson
     let isUnlocked: Bool
     let isCompleted: Bool
     let isActive: Bool
