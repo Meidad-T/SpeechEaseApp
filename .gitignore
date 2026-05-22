@@ -1,0 +1,48 @@
+# Xcode
+#
+# Reference: https://developer.apple.com/library/archive/technotes/tn2339/_index.html
+
+# Build artifacts
+build/
+DerivedData/
+
+# Personal settings
+xcuserdata/
+
+# Architecture signatures
+*.xcent
+*.xcdatamodeld
+
+# Xcode State
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+
+# Swift Package Manager
+#
+# Add this line if you want to avoid committing the cached packages.
+.build/
+Packages/
+Package.resolved
+Package.pins
+
+# Carthage
+#
+# Add this line to avoid committing Carthage dependencies.
+Carthage/Build/
+
+# Fastlane
+#
+# It is recommended to not store the screenshots in the git repo.
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Bundle
+.bundle/
+vendor/bundle/
+
+# macOS
+.DS_Store
