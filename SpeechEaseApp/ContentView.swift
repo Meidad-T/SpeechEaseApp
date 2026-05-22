@@ -43,16 +43,6 @@ struct ContentView: View {
     }
 }
 
-struct LearnView: View {
-    var body: some View {
-        VStack {
-            Text("Learn Content")
-                .foregroundColor(.secondary)
-        }
-        .navigationTitle("Learn")
-    }
-}
-
 struct PracticeView: View {
     var body: some View {
         VStack {
