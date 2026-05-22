@@ -40,8 +40,12 @@ struct LessonNode: View {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(.white)
+                    } else if isCompleted {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
                     } else {
-                        Image(systemName: lesson.icon)
+                        Image(systemName: "star.fill")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(.white)
                     }
@@ -50,18 +54,6 @@ struct LessonNode: View {
             }
             .buttonStyle(Duolingo3DButtonStyle(color: themeColor, isUnlocked: isUnlocked, isCompleted: isCompleted))
             .disabled(!isUnlocked)
-            
-            // Completed indicator (small gold crown badge in top-right)
-            if isCompleted {
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.yellow)
-                    .padding(4)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 1)
-                    .offset(x: 22, y: -22)
-            }
         }
         .frame(width: 80, height: 80)
     }
