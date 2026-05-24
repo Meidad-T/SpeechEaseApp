@@ -25,7 +25,6 @@ struct PracticeHeaderBanner: View {
                     .foregroundStyle(.white.opacity(0.85))
             }
             Spacer()
-            // Streak pill
             HStack(spacing: 4) {
                 Text("🔥")
                 Text("3 day streak")
@@ -38,6 +37,7 @@ struct PracticeHeaderBanner: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 16)
-        .background(Color.orange)
+        .background(selectedTopic.color) // ← changes with selection
+        .animation(.easeInOut(duration: 0.3), value: selectedTopic)
     }
 }
