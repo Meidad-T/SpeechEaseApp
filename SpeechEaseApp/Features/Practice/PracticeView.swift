@@ -10,27 +10,31 @@ import SwiftUI
 struct PracticeView: View {
     @State private var selectedTopic: PracticeTopic = .structure
     @State private var showSession = false
-    @State private var showPathSelector = false
-    @State private var showHeartsRefill = false
 
     var body: some View {
         VStack(spacing: 0) {
-            // Matches exactly how LearnView calls it
-            MetricsHeaderView(
-                onSelectTopic: {
-                    showPathSelector = true
-                },
-                onRefillHearts: {
-                    showHeartsRefill = true
+
+            // Placeholder header — replace with MetricsHeaderView when branches merge
+            HStack {
+                Text("Practice")
+                    .font(.system(size: 17, weight: .semibold))
+                Spacer()
+                HStack(spacing: 12) {
+                    Label("0", systemImage: "crown")
+                    Label("0", systemImage: "flame")
+                    Label("150", systemImage: "diamond")
+                    Label("5", systemImage: "heart.fill")
                 }
-            )
+                .font(.system(size: 13, weight: .medium))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(UIColor.systemBackground))
 
             Divider()
 
-            // Orange header banner
             PracticeHeaderBanner(selectedTopic: selectedTopic)
 
-            // Scrollable content
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     TopicChipsView(selected: $selectedTopic)
@@ -46,12 +50,6 @@ struct PracticeView: View {
         .ignoresSafeArea(edges: .top)
         .fullScreenCover(isPresented: $showSession) {
             PracticeSessionView(topic: selectedTopic)
-        }
-        .sheet(isPresented: $showPathSelector) {
-            PathSelectorView()
-        }
-        .sheet(isPresented: $showHeartsRefill) {
-            HeartsRefillView()
         }
     }
 }
