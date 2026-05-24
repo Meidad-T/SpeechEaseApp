@@ -53,6 +53,16 @@ struct PracticeView: View {
     }
 }
 
+struct LearnView: View {
+    var body: some View {
+        VStack {
+            Text("Learn Content")
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle("Learn")
+    }
+}
+
 struct SpeechProgressView: View {
     var body: some View {
         VStack {
