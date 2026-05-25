@@ -13,8 +13,6 @@ struct PracticeView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
-            // Placeholder header — replace with MetricsHeaderView when branches merge
             HStack {
                 Text("Practice")
                     .font(.system(size: 17, weight: .semibold))
@@ -49,7 +47,14 @@ struct PracticeView: View {
         }
         .ignoresSafeArea(edges: .top)
         .fullScreenCover(isPresented: $showSession) {
-            PracticeSessionView(topic: selectedTopic)
+            PracticeSessionView(topic: selectedTopic, onDismiss: {
+                showSession = false
+            })
+            .background(Color.black)
+        }
+        .transaction { transaction in
+            // Replace the default sheet slide with a fade
+            transaction.animation = .easeInOut(duration: 0.35)
         }
     }
 }

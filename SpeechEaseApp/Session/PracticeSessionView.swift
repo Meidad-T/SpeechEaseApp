@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PracticeSessionView: View {
     let topic: PracticeTopic
-    @Environment(\.dismiss) var dismiss
+    let onDismiss: () -> Void
 
     @State private var sessionState: SessionState = .speaking
     @State private var currentSubtitle = "How would you open a presentation to grab your audience's attention?"
@@ -17,6 +17,7 @@ struct PracticeSessionView: View {
     @State private var questionNumber = 3
     @State private var totalQuestions = 5
     @State private var elapsed = "2:34"
+    @State private var appeared = false
 
     var body: some View {
         ZStack {
@@ -25,13 +26,22 @@ struct PracticeSessionView: View {
 
             VStack(spacing: 0) {
 
-                // ── Top bar ──
-                SessionTopBar(elapsed: elapsed) { dismiss() }
-                    .padding(.top, 8)
+                // Safe area spacer for status bar
+                Color.clear
+                    .frame(height: 0)
+                    .ignoresSafeArea(edges: .top)
+
+                // Top bar — sits below status bar naturally
+                SessionTopBar(elapsed: elapsed) {
+                    onDismiss()
+                }
+                .padding(.top, 8)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : -12)
 
                 Spacer()
 
-                // ── Question counter ──
+                // Question counter
                 Text("QUESTION \(questionNumber) OF \(totalQuestions)")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(
@@ -41,47 +51,65 @@ struct PracticeSessionView: View {
                     )
                     .tracking(2)
                     .padding(.bottom, 24)
+                    .opacity(appeared ? 1 : 0)
 
-                // ── Orb ──
+                // Orb
                 SessionOrbView(state: sessionState)
+                    .scaleEffect(appeared ? 1 : 0.82)
+                    .opacity(appeared ? 1 : 0)
 
-                // ── Waveform (speaking only) ──
+                // Waveform
                 if sessionState == .speaking {
                     AudioWaveformView()
                         .padding(.top, 20)
+                        .opacity(appeared ? 1 : 0)
                 }
 
                 Spacer()
 
-                // ── Subtitle ──
+                // Subtitle
                 if !currentSubtitle.isEmpty {
                     SubtitleDissolveView(
                         text: currentSubtitle,
                         dissolve: shouldDissolve
                     )
                     .padding(.horizontal, 32)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 14)
                 }
 
-                // ── User transcript (listening only) ──
+                // User transcript
                 if sessionState == .listening {
                     UserTranscriptView(text: "I would start with a bold question that...")
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
+                        .opacity(appeared ? 1 : 0)
                 }
 
                 Spacer()
 
-                // ── Status pill ──
+                // Status pill
                 StatusPillView(state: sessionState)
                     .padding(.bottom, 16)
+                    .opacity(appeared ? 1 : 0)
 
-                // ── End session button ──
+                // Action button
                 SessionButton(state: sessionState) {
-                    sessionState = sessionState == .speaking ? .listening : .speaking
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        sessionState = sessionState == .speaking ? .listening : .speaking
+                    }
                 }
-                .padding(.bottom, 48)
+                .padding(.bottom, 52)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 18)
             }
         }
         .preferredColorScheme(.dark)
+        .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.82).delay(0.05)) {
+                appeared = true
+            }
+        }
     }
 }
