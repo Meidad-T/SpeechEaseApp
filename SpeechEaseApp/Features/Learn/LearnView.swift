@@ -13,6 +13,7 @@ struct LearnView: View {
     @State private var selectedLesson: Lesson? = nil
     
     private let spacing: CGFloat = 100
+    private let scrollAnchor = UnitPoint(x: 0.5, y: 0.65)
     
     var body: some View {
         VStack(spacing: 0) {
@@ -118,7 +119,7 @@ struct LearnView: View {
                     .onAppear {
                         // Scroll to the active lesson node & focus it
                         if activeIndex < lessonsList.count {
-                            scrollProxy.scrollTo(lessonsList[activeIndex].id, anchor: .center)
+                            scrollProxy.scrollTo(lessonsList[activeIndex].id, anchor: scrollAnchor)
                         }
                     }
                     .onChange(of: manager.activeTopicId) { newTopicId in
@@ -132,7 +133,7 @@ struct LearnView: View {
                         }()
                         if activeIndex < lessons.count {
                             withAnimation {
-                                scrollProxy.scrollTo(lessons[activeIndex].id, anchor: .center)
+                                scrollProxy.scrollTo(lessons[activeIndex].id, anchor: scrollAnchor)
                             }
                         }
                     }
