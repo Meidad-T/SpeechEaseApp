@@ -227,45 +227,54 @@ struct LearnView: View {
     }
     
     private func configForAnimation(name: String, screenWidth: CGFloat) -> LottieAnimationConfig {
-        // Scale from iPhone 15 (393pt) base values that were visually confirmed to work.
-        // Fixed offsetX=115 keeps the character in the comfortable side gap on all devices.
+        // Scale from iPhone 15 Pro (393pt) base values that were visually confirmed to work.
+        // Fixed offsetX=115 keeps the character in the comfortable side gap on large screens.
         // Moving .offset() BEFORE .clipped() means the clip boundary IS the screen edge,
         // so canvas whitespace that overflows the screen edge is always hidden cleanly.
         let scale = screenWidth / 393
 
+        // Small-screen adjustments (< 400pt, e.g. iPhone SE, standard iPhone 15):
+        // - 10% smaller size
+        // - Move ~5% of screenWidth closer to path so the outer wing clears the screen edge.
+        //   (Using 5% of screenWidth ~19pt, not 5% of offsetX ~6pt, to get enough clearance.)
+        let isSmallScreen = screenWidth < 400
+        let smallSizeFactor: CGFloat = isSmallScreen ? 0.90 : 1.0
+        // 5% of screenWidth toward center, expressed as a reduction from the 115pt base offset.
+        let smallOffsetX: CGFloat = isSmallScreen ? max(115 - screenWidth * 0.05, 80) : 115
+
         switch name {
         case "peachysinging":
-            let animW = 380 * scale
-            let animH = 270 * scale
-            let visH  = animH * 0.930          // crop bottom ~7%
+            let animW = 380 * scale * smallSizeFactor
+            let animH = 270 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.950 : 0.930)  // small: less crop → more tail/feet visible
             return LottieAnimationConfig(
                 name: "peachysinging",
                 width: animW, height: animH, visibleHeight: visH,
-                offsetX: 115,                  // fixed: character sits comfortably in side zone
-                shadowY: visH * 0.328,         // just touching the feet
+                offsetX: smallOffsetX,
+                shadowY: visH * 0.328,
                 shadowWidth: animW * 0.24, shadowHeight: 14
             )
 
         case "peachy_flying":
-            let animW = 400 * scale
-            let animH = 212 * scale
-            let visH  = animH * 0.895          // crop bottom ~10%
+            let animW = 400 * scale * smallSizeFactor
+            let animH = 212 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.930 : 0.895)  // small: 7% crop vs 10.5%
             return LottieAnimationConfig(
                 name: "peachy_flying",
                 width: animW, height: animH, visibleHeight: visH,
-                offsetX: 115,
+                offsetX: smallOffsetX,
                 shadowY: visH * 0.455,
                 shadowWidth: animW * 0.18, shadowHeight: 12
             )
 
         default:
-            let animW = 320 * scale
-            let animH = 240 * scale
-            let visH  = animH * 0.93
+            let animW = 320 * scale * smallSizeFactor
+            let animH = 240 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.950 : 0.930)
             return LottieAnimationConfig(
                 name: name,
                 width: animW, height: animH, visibleHeight: visH,
-                offsetX: 115,
+                offsetX: smallOffsetX,
                 shadowY: visH * 0.38,
                 shadowWidth: animW * 0.22, shadowHeight: 14
             )
