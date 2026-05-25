@@ -246,7 +246,7 @@ struct LearnView: View {
         case "peachysinging":
             let animW = 380 * scale * smallSizeFactor
             let animH = 270 * scale * smallSizeFactor
-            let visH  = animH * (isSmallScreen ? 0.950 : 0.930)  // small: less crop → more tail/feet visible
+            let visH  = animH * (isSmallScreen ? 0.930 : 0.930)  // small: crop 2% more to hide black bar (0.950 -> 0.930)
             return LottieAnimationConfig(
                 name: "peachysinging",
                 width: animW, height: animH, visibleHeight: visH,
@@ -258,7 +258,7 @@ struct LearnView: View {
         case "peachy_flying":
             let animW = 400 * scale * smallSizeFactor
             let animH = 212 * scale * smallSizeFactor
-            let visH  = animH * (isSmallScreen ? 0.930 : 0.895)  // small: 7% crop vs 10.5%
+            let visH  = animH * (isSmallScreen ? 0.910 : 0.895)  // small: crop 2% more to hide black bar (0.930 -> 0.910)
             return LottieAnimationConfig(
                 name: "peachy_flying",
                 width: animW, height: animH, visibleHeight: visH,
@@ -270,7 +270,7 @@ struct LearnView: View {
         default:
             let animW = 320 * scale * smallSizeFactor
             let animH = 240 * scale * smallSizeFactor
-            let visH  = animH * (isSmallScreen ? 0.950 : 0.930)
+            let visH  = animH * (isSmallScreen ? 0.930 : 0.930)
             return LottieAnimationConfig(
                 name: name,
                 width: animW, height: animH, visibleHeight: visH,
