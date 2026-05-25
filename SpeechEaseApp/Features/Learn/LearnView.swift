@@ -99,19 +99,20 @@ struct LearnView: View {
                                     let direction: CGFloat = sin(Double(index) * 0.8) > 0 ? 1 : -1
                                     let spotIndex = (index - 2) / 4
                                     let animName = animationNameFor(unitIndex: topicIndex, spotIndex: spotIndex)
+                                    let config = configForAnimation(name: animName)
                                     
                                     // Custom ground shadow under the bird
                                     Ellipse()
                                         .fill(Color.black.opacity(0.12))
-                                        .frame(width: 80, height: 14)
-                                        .offset(x: direction * 85, y: 88)
+                                        .frame(width: config.shadowWidth, height: config.shadowHeight)
+                                        .offset(x: direction * config.offsetMultiplier, y: config.shadowY)
                                     
-                                    LottieView(filename: animName)
-                                        .frame(width: 350, height: 250)
+                                    LottieView(filename: config.name)
+                                        .frame(width: config.width, height: config.height)
                                         .allowsHitTesting(false)
-                                        .frame(height: 232, alignment: .top)
+                                        .frame(height: config.visibleHeight, alignment: .top)
                                         .clipped()
-                                        .offset(x: direction * 85)
+                                        .offset(x: direction * config.offsetMultiplier)
                                 }
                                 
                                 LessonNode(
@@ -222,6 +223,44 @@ struct LearnView: View {
         }
     }
     
+    private func configForAnimation(name: String) -> LottieAnimationConfig {
+        switch name {
+        case "peachysinging":
+            return LottieAnimationConfig(
+                name: "peachysinging",
+                width: 380,
+                height: 270,
+                visibleHeight: 251,
+                offsetMultiplier: 110,
+                shadowY: 82, // truly touching the feet (higher up, was 88)
+                shadowWidth: 90,
+                shadowHeight: 14
+            )
+        case "peachy_flying":
+            return LottieAnimationConfig(
+                name: "peachy_flying",
+                width: 300,
+                height: 212,
+                visibleHeight: 198,
+                offsetMultiplier: 110,
+                shadowY: 88, // where it was
+                shadowWidth: 70,
+                shadowHeight: 12
+            )
+        default:
+            return LottieAnimationConfig(
+                name: name,
+                width: 300,
+                height: 250,
+                visibleHeight: 232,
+                offsetMultiplier: 110,
+                shadowY: 88,
+                shadowWidth: 80,
+                shadowHeight: 14
+            )
+        }
+    }
+    
     private var activeTopicColor: Color {
         let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
         return colorForTopicType(activeType)
@@ -249,4 +288,15 @@ struct LearnView: View {
         case .audience: return "bubble.left.and.bubble.right.fill"
         }
     }
+}
+
+struct LottieAnimationConfig {
+    let name: String
+    let width: CGFloat
+    let height: CGFloat
+    let visibleHeight: CGFloat
+    let offsetMultiplier: CGFloat
+    let shadowY: CGFloat
+    let shadowWidth: CGFloat
+    let shadowHeight: CGFloat
 }
