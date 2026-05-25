@@ -12,7 +12,6 @@ struct LearnView: View {
     @State private var showHeartsRefill = false
     @State private var selectedLesson: Lesson? = nil
     
-    private let spacing: CGFloat = 100
     private let scrollAnchor = UnitPoint(x: 0.5, y: 0.65)
     
     var body: some View {
@@ -83,20 +82,35 @@ struct LearnView: View {
             .background(activeTopicColor)
             
             // 3. The scrollable path content
-            let pathHeight = CGFloat(lessonsList.count) * spacing + 120
-            
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 ScrollViewReader { scrollProxy in
-                    GeometryReader { geo in
-                        let centerX = geo.size.width / 2
-                        
-                        ZStack {
-                            // Lesson Nodes (floating on white background in wavy format)
-                            ForEach(Array(lessonsList.enumerated()), id: \.element.id) { index, lesson in
-                                let isUnlocked = manager.isLessonUnlocked(id: lesson.id, allLessons: lessonsList)
-                                let isCompleted = manager.isLessonCompleted(id: lesson.id)
-                                let isActive = (index == activeIndex)
-                                let pos = positionForLesson(index: index, totalHeight: pathHeight, centerX: centerX)
+                    VStack(spacing: 10) {
+                        ForEach(Array(lessonsList.enumerated()), id: \.element.id) { index, lesson in
+                            let isUnlocked = manager.isLessonUnlocked(id: lesson.id, allLessons: lessonsList)
+                            let isCompleted = manager.isLessonCompleted(id: lesson.id)
+                            let isActive = (index == activeIndex)
+                            
+                            let amplitude: CGFloat = 55
+                            let xOffset = -amplitude * sin(Double(index) * 0.8)
+                            
+                            ZStack {
+                                // Peachy Singing animation if this is a gap index
+                                if index % 4 == 2 {
+                                    let direction: CGFloat = sin(Double(index) * 0.8) > 0 ? 1 : -1
+                                    
+                                    // Custom ground shadow under the bird
+                                    Ellipse()
+                                        .fill(Color.black.opacity(0.12))
+                                        .frame(width: 80, height: 14)
+                                        .offset(x: direction * 85, y: 92)
+                                    
+                                    LottieView(filename: "peachysinging")
+                                        .frame(width: 350, height: 250)
+                                        .allowsHitTesting(false)
+                                        .frame(height: 232, alignment: .top)
+                                        .clipped()
+                                        .offset(x: direction * 85)
+                                }
                                 
                                 LessonNode(
                                     isUnlocked: isUnlocked,
@@ -109,13 +123,13 @@ struct LearnView: View {
                                         }
                                     }
                                 )
-                                .position(x: pos.x, y: pos.y)
+                                .offset(x: xOffset)
                                 .id(lesson.id)
                             }
+                            .frame(height: 100)
                         }
-                        .frame(height: pathHeight)
                     }
-                    .frame(height: pathHeight)
+                    .padding(.vertical, 40)
                     .onAppear {
                         // Scroll to the active lesson node & focus it
                         if activeIndex < lessonsList.count {
@@ -193,15 +207,6 @@ struct LearnView: View {
     }
     
     // Helpers
-    private func positionForLesson(index: Int, totalHeight: CGFloat, centerX: CGFloat) -> CGPoint {
-        let startY = totalHeight - 80
-        let y = startY - CGFloat(index) * spacing
-        let indexLike = (totalHeight - 80 - y) / spacing
-        let amplitude: CGFloat = 55
-        let xOffset = amplitude * sin(Double(indexLike) * 0.8)
-        return CGPoint(x: centerX + xOffset, y: y)
-    }
-    
     private var activeTopicColor: Color {
         let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
         return colorForTopicType(activeType)

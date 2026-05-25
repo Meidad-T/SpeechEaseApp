@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		536BDE14E2AE3FE943C5642A /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 26D0A54D960E9E5D3CF138C1 /* Lottie */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		10F3385A2FC001E600D52B36 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				536BDE14E2AE3FE943C5642A /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = SpeechEaseApp;
 			packageProductDependencies = (
+				26D0A54D960E9E5D3CF138C1 /* Lottie */,
 			);
 			productName = SpeechEaseApp;
 			productReference = 10F3384C2FC001E500D52B36 /* SpeechEaseApp.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 10F338432FC001E500D52B36;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E66F4FB578FA32EA018312CB /* XCRemoteSwiftPackageReference "lottie-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 10F3384D2FC001E500D52B36 /* Products */;
 			projectDirPath = "";
@@ -625,6 +634,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+/* Begin XCRemoteSwiftPackageReference section */
+		E66F4FB578FA32EA018312CB /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.4.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		26D0A54D960E9E5D3CF138C1 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E66F4FB578FA32EA018312CB /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 10F338442FC001E500D52B36 /* Project object */;
 }

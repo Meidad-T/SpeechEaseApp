@@ -24,7 +24,7 @@ struct LessonNode: View {
                     .stroke(themeColor.opacity(0.4), lineWidth: 6)
                     .scaleEffect(animatePulse ? 1.3 : 1.0)
                     .opacity(animatePulse ? 0.0 : 1.0)
-                    .frame(width: 86, height: 86)
+                    .frame(width: 104, height: 104)
                     .onAppear {
                         withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false)) {
                             animatePulse = true
@@ -37,24 +37,24 @@ struct LessonNode: View {
                 ZStack {
                     if !isUnlocked {
                         Image(systemName: "lock.fill")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                     } else if isCompleted {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                     } else {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                     }
                 }
-                .frame(width: 64, height: 64)
+                .frame(width: 82, height: 82)
             }
             .buttonStyle(Duolingo3DButtonStyle(color: themeColor, isUnlocked: isUnlocked, isCompleted: isCompleted))
             .disabled(!isUnlocked)
         }
-        .frame(width: 80, height: 80)
+        .frame(width: 100, height: 100)
     }
 }
 
@@ -91,6 +91,6 @@ struct Duolingo3DButtonStyle: ButtonStyle {
                 .offset(y: configuration.isPressed ? 4 : 0)
                 .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
         }
-        .frame(width: 64, height: 64)
+        .frame(width: 82, height: 82)
     }
 }
