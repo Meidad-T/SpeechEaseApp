@@ -9,34 +9,30 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    
+    @State private var tabOpacity = 1.0
+
     var body: some View {
         TabView(selection: $selectedTab) {
+
             // 1. Learn Tab
             NavigationStack {
                 LearnView()
             }
-            .tabItem {
-                Label("Learn", systemImage: "book.fill")
-            }
+            .tabItem { Label("Learn", systemImage: "book.fill") }
             .tag(0)
 
             // 2. Practice Tab
             NavigationStack {
                 PracticeView()
             }
-            .tabItem {
-                Label("Practice", systemImage: "mic.fill")
-            }
+            .tabItem { Label("Practice", systemImage: "mic.fill") }
             .tag(1)
-            
+
             // 3. Progress Tab
             NavigationStack {
                 SpeechProgressView()
             }
-            .tabItem {
-                Label("Progress", systemImage: "chart.bar.xaxis")
-            }
+            .tabItem { Label("Progress", systemImage: "chart.bar.xaxis") }
             .tag(2)
         }
         .tint(.orange)
@@ -58,18 +54,17 @@ struct LearnView: View {
         VStack {
             Text("Learn Content")
                 .foregroundColor(.secondary)
+        .opacity(tabOpacity)
+        .onChange(of: selectedTab) { _ in
+            withAnimation(.easeIn(duration: 0.12)) {
+                tabOpacity = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                withAnimation(.easeOut(duration: 0.22)) {
+                    tabOpacity = 1
+                }
+            }
         }
-        .navigationTitle("Learn")
-    }
-}
-
-struct SpeechProgressView: View {
-    var body: some View {
-        VStack {
-            Text("Progress Content")
-                .foregroundColor(.secondary)
-        }
-        .navigationTitle("Progress")
     }
 }
 
