@@ -82,6 +82,9 @@ struct LearnView: View {
             .background(activeTopicColor)
             
             // 3. The scrollable path content
+            // Use UIScreen width so we can size animations proportionally without
+            // wrapping the layout in a GeometryReader (which breaks VStack centering).
+            let screenWidth = UIScreen.main.bounds.width
             ScrollView(showsIndicators: false) {
                 ScrollViewReader { scrollProxy in
                     VStack(spacing: 10) {
@@ -99,20 +102,20 @@ struct LearnView: View {
                                     let direction: CGFloat = sin(Double(index) * 0.8) > 0 ? 1 : -1
                                     let spotIndex = (index - 2) / 4
                                     let animName = animationNameFor(unitIndex: topicIndex, spotIndex: spotIndex)
-                                    let config = configForAnimation(name: animName)
+                                    let config = configForAnimation(name: animName, screenWidth: screenWidth)
                                     
                                     // Custom ground shadow under the bird
                                     Ellipse()
                                         .fill(Color.black.opacity(0.12))
                                         .frame(width: config.shadowWidth, height: config.shadowHeight)
-                                        .offset(x: direction * config.offsetMultiplier, y: config.shadowY)
+                                        .offset(x: direction * config.offsetX, y: config.shadowY)
                                     
                                     LottieView(filename: config.name)
                                         .frame(width: config.width, height: config.height)
                                         .allowsHitTesting(false)
                                         .frame(height: config.visibleHeight, alignment: .top)
-                                        .clipped()
-                                        .offset(x: direction * config.offsetMultiplier)
+                                        .offset(x: direction * config.offsetX)  // offset BEFORE clip
+                                        .clipped()                               // clips at screen edge
                                 }
                                 
                                 LessonNode(
@@ -223,40 +226,48 @@ struct LearnView: View {
         }
     }
     
-    private func configForAnimation(name: String) -> LottieAnimationConfig {
+    private func configForAnimation(name: String, screenWidth: CGFloat) -> LottieAnimationConfig {
+        // Scale from iPhone 15 (393pt) base values that were visually confirmed to work.
+        // Fixed offsetX=115 keeps the character in the comfortable side gap on all devices.
+        // Moving .offset() BEFORE .clipped() means the clip boundary IS the screen edge,
+        // so canvas whitespace that overflows the screen edge is always hidden cleanly.
+        let scale = screenWidth / 393
+
         switch name {
         case "peachysinging":
+            let animW = 380 * scale
+            let animH = 270 * scale
+            let visH  = animH * 0.930          // crop bottom ~7%
             return LottieAnimationConfig(
                 name: "peachysinging",
-                width: 380,
-                height: 270,
-                visibleHeight: 251,
-                offsetMultiplier: 110,
-                shadowY: 82, // truly touching the feet (higher up, was 88)
-                shadowWidth: 90,
-                shadowHeight: 14
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: 115,                  // fixed: character sits comfortably in side zone
+                shadowY: visH * 0.328,         // just touching the feet
+                shadowWidth: animW * 0.24, shadowHeight: 14
             )
+
         case "peachy_flying":
+            let animW = 400 * scale
+            let animH = 212 * scale
+            let visH  = animH * 0.895          // crop bottom ~10%
             return LottieAnimationConfig(
                 name: "peachy_flying",
-                width: 300,
-                height: 212,
-                visibleHeight: 198,
-                offsetMultiplier: 110,
-                shadowY: 88, // where it was
-                shadowWidth: 70,
-                shadowHeight: 12
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: 115,
+                shadowY: visH * 0.455,
+                shadowWidth: animW * 0.18, shadowHeight: 12
             )
+
         default:
+            let animW = 320 * scale
+            let animH = 240 * scale
+            let visH  = animH * 0.93
             return LottieAnimationConfig(
                 name: name,
-                width: 300,
-                height: 250,
-                visibleHeight: 232,
-                offsetMultiplier: 110,
-                shadowY: 88,
-                shadowWidth: 80,
-                shadowHeight: 14
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: 115,
+                shadowY: visH * 0.38,
+                shadowWidth: animW * 0.22, shadowHeight: 14
             )
         }
     }
@@ -295,7 +306,9 @@ struct LottieAnimationConfig {
     let width: CGFloat
     let height: CGFloat
     let visibleHeight: CGFloat
-    let offsetMultiplier: CGFloat
+    /// Horizontal distance from the ZStack center to the animation center.
+    /// Computed relative to actual screen width so it scales across devices.
+    let offsetX: CGFloat
     let shadowY: CGFloat
     let shadowWidth: CGFloat
     let shadowHeight: CGFloat
