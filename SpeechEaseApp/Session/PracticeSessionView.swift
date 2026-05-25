@@ -11,7 +11,6 @@ struct PracticeSessionView: View {
     let topic: PracticeTopic
     @Environment(\.dismiss) var dismiss
 
-    // Will be replaced by real GeminiLiveSession state later
     @State private var sessionState: SessionState = .speaking
     @State private var currentSubtitle = "How would you open a presentation to grab your audience's attention?"
     @State private var shouldDissolve = false
@@ -25,64 +24,59 @@ struct PracticeSessionView: View {
             OrangeGradientOverlay(isActive: sessionState == .speaking)
 
             VStack(spacing: 0) {
-                // Top bar
+
+                // ── Top bar ──
                 SessionTopBar(elapsed: elapsed) { dismiss() }
+                    .padding(.top, 8)
 
                 Spacer()
 
-                // Question counter
+                // ── Question counter ──
                 Text("QUESTION \(questionNumber) OF \(totalQuestions)")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(
                         sessionState == .speaking
-                        ? Color.orange.opacity(0.85)
+                        ? Color.orange.opacity(0.9)
                         : Color.white.opacity(0.35)
                     )
-                    .tracking(1.5)
-                    .padding(.bottom, 20)
+                    .tracking(2)
+                    .padding(.bottom, 24)
 
-                // Central orb
+                // ── Orb ──
                 SessionOrbView(state: sessionState)
-                    .padding(.bottom, 16)
 
-                // State label
-                Text(sessionState.statusLabel)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.55))
-                    .tracking(1.2)
-                    .padding(.bottom, sessionState == .speaking ? 12 : 24)
-
-                // Waveform (only when speaking)
+                // ── Waveform (speaking only) ──
                 if sessionState == .speaking {
                     AudioWaveformView()
-                        .padding(.bottom, 8)
+                        .padding(.top, 20)
                 }
 
                 Spacer()
 
-                // Subtitle
+                // ── Subtitle ──
                 if !currentSubtitle.isEmpty {
                     SubtitleDissolveView(
                         text: currentSubtitle,
                         dissolve: shouldDissolve
                     )
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 32)
                 }
 
-                // User transcript (listening state)
+                // ── User transcript (listening only) ──
                 if sessionState == .listening {
                     UserTranscriptView(text: "I would start with a bold question that...")
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                        .padding(.top, 16)
                 }
 
-                // Status pill + stop button
-                StatusPillView(state: sessionState)
-                    .padding(.bottom, 20)
+                Spacer()
 
+                // ── Status pill ──
+                StatusPillView(state: sessionState)
+                    .padding(.bottom, 16)
+
+                // ── End session button ──
                 SessionButton(state: sessionState) {
-                    // toggle for preview; real logic comes with Gemini
                     sessionState = sessionState == .speaking ? .listening : .speaking
                 }
                 .padding(.bottom, 48)

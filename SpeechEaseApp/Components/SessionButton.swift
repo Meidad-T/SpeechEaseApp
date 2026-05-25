@@ -11,21 +11,46 @@ struct SessionButton: View {
     let state: SessionState
     let action: () -> Void
 
-    var isActive: Bool {
-        state == .listening || state == .speaking
+    var icon: String {
+        switch state {
+        case .speaking:   return "forward.end.fill"    // skip Gemini speaking
+        case .listening:  return "checkmark.circle.fill" // done answering
+        default:          return "mic.fill"
+        }
+    }
+
+    var label: String {
+        switch state {
+        case .speaking:  return "Skip"
+        case .listening: return "Done"
+        default:         return "Start"
+        }
+    }
+
+    var color: Color {
+        switch state {
+        case .speaking:  return Color.white.opacity(0.15)  // subtle, Gemini owns this moment
+        case .listening: return Color.orange               // prominent, your turn to submit
+        default:         return Color.orange
+        }
     }
 
     var body: some View {
         Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(isActive ? Color.red.opacity(0.85) : Color.orange)
-                    .frame(width: 68, height: 68)
-                Image(systemName: isActive ? "stop.fill" : "mic.fill")
-                    .font(.system(size: 26))
-                    .foregroundStyle(.white)
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                Text(label)
+                    .font(.system(size: 15, weight: .semibold))
             }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 28)
+            .padding(.vertical, 16)
+            .background(color, in: Capsule())
+            .overlay(
+                Capsule().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
+            )
         }
-        .animation(.spring(duration: 0.3), value: isActive)
+        .animation(.spring(duration: 0.3), value: state)
     }
 }

@@ -13,16 +13,19 @@ struct SessionOrbView: View {
 
     var body: some View {
         ZStack {
-            // Outer rings (only when speaking)
+            // Pulse rings — only when speaking
             if state == .speaking {
                 Circle()
                     .stroke(Color.orange.opacity(0.2), lineWidth: 1.5)
                     .frame(width: 140, height: 140)
-                    .scaleEffect(pulse ? 1.0 : 0.92)
+                    .scaleEffect(pulse ? 1.05 : 0.95)
+                    .animation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: pulse)
+
                 Circle()
-                    .stroke(Color.orange.opacity(0.12), lineWidth: 1)
-                    .frame(width: 164, height: 164)
+                    .stroke(Color.orange.opacity(0.1), lineWidth: 1)
+                    .frame(width: 170, height: 170)
                     .scaleEffect(pulse ? 1.0 : 0.88)
+                    .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: pulse)
             }
 
             // Core orb
@@ -41,29 +44,20 @@ struct SessionOrbView: View {
                 .frame(width: 96, height: 96)
                 .overlay(
                     Circle().stroke(
-                        state == .speaking
-                        ? Color.clear
-                        : Color.white.opacity(0.15),
+                        state == .speaking ? Color.clear : Color.white.opacity(0.15),
                         lineWidth: 1.5
                     )
                 )
                 .overlay(
                     Image(systemName: state == .speaking ? "sparkle" : "mic.fill")
-                        .font(.system(size: state == .speaking ? 34 : 30))
+                        .font(.system(size: state == .speaking ? 34 : 30, weight: .medium))
                         .foregroundStyle(.white)
                 )
         }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
-                pulse = true
-            }
-        }
-        .onChange(of: state) { _ in pulse = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
-                    pulse = true
-                }
-            }
+        .onAppear { pulse = true }
+        .onChange(of: state) { _ in
+            pulse = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { pulse = true }
         }
     }
 }
