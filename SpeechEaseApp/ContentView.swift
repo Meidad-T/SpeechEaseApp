@@ -36,24 +36,6 @@ struct ContentView: View {
             .tag(2)
         }
         .tint(.orange)
-    }
-}
-
-struct PracticeView: View {
-    var body: some View {
-        VStack {
-            Text("Practice Content")
-                .foregroundColor(.secondary)
-        }
-        .navigationTitle("Practice")
-    }
-}
-
-struct LearnView: View {
-    var body: some View {
-        VStack {
-            Text("Learn Content")
-                .foregroundColor(.secondary)
         .opacity(tabOpacity)
         .onChange(of: selectedTab) { _ in
             withAnimation(.easeIn(duration: 0.12)) {
@@ -65,6 +47,22 @@ struct LearnView: View {
                 }
             }
         }
+    }
+}
+
+struct SpeechProgressView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "chart.bar.xaxis")
+                .font(.system(size: 48))
+                .foregroundStyle(.orange)
+            Text("Progress tab coming soon")
+                .font(.system(size: 17))
+                .foregroundStyle(.secondary)
+                .padding(.top, 8)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationTitle("Progress")
     }
 }
 
