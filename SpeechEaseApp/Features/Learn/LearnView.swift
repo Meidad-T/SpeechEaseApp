@@ -12,7 +12,7 @@ struct LearnView: View {
     @State private var showHeartsRefill = false
     @State private var selectedLesson: Lesson? = nil
     
-    private let spacing: CGFloat = 100
+    private let scrollAnchor = UnitPoint(x: 0.5, y: 0.65)
     
     var body: some View {
         VStack(spacing: 0) {
@@ -82,20 +82,41 @@ struct LearnView: View {
             .background(activeTopicColor)
             
             // 3. The scrollable path content
-            let pathHeight = CGFloat(lessonsList.count) * spacing + 120
-            
-            ScrollView {
+            // Use UIScreen width so we can size animations proportionally without
+            // wrapping the layout in a GeometryReader (which breaks VStack centering).
+            let screenWidth = UIScreen.main.bounds.width
+            ScrollView(showsIndicators: false) {
                 ScrollViewReader { scrollProxy in
-                    GeometryReader { geo in
-                        let centerX = geo.size.width / 2
-                        
-                        ZStack {
-                            // Lesson Nodes (floating on white background in wavy format)
-                            ForEach(Array(lessonsList.enumerated()), id: \.element.id) { index, lesson in
-                                let isUnlocked = manager.isLessonUnlocked(id: lesson.id, allLessons: lessonsList)
-                                let isCompleted = manager.isLessonCompleted(id: lesson.id)
-                                let isActive = (index == activeIndex)
-                                let pos = positionForLesson(index: index, totalHeight: pathHeight, centerX: centerX)
+                    VStack(spacing: 10) {
+                        ForEach(Array(lessonsList.enumerated()), id: \.element.id) { index, lesson in
+                            let isUnlocked = manager.isLessonUnlocked(id: lesson.id, allLessons: lessonsList)
+                            let isCompleted = manager.isLessonCompleted(id: lesson.id)
+                            let isActive = (index == activeIndex)
+                            
+                            let amplitude: CGFloat = 55
+                            let xOffset = -amplitude * sin(Double(index) * 0.8)
+                            
+                            ZStack {
+                                // Peachy character animations in the gaps
+                                if index % 4 == 2 {
+                                    let direction: CGFloat = sin(Double(index) * 0.8) > 0 ? 1 : -1
+                                    let spotIndex = (index - 2) / 4
+                                    let animName = animationNameFor(unitIndex: topicIndex, spotIndex: spotIndex)
+                                    let config = configForAnimation(name: animName, screenWidth: screenWidth)
+                                    
+                                    // Custom ground shadow under the bird
+                                    Ellipse()
+                                        .fill(Color.black.opacity(0.12))
+                                        .frame(width: config.shadowWidth, height: config.shadowHeight)
+                                        .offset(x: direction * config.offsetX, y: config.shadowY)
+                                    
+                                    LottieView(filename: config.name)
+                                        .frame(width: config.width, height: config.height)
+                                        .allowsHitTesting(false)
+                                        .frame(height: config.visibleHeight, alignment: .top)
+                                        .offset(x: direction * config.offsetX)  // offset BEFORE clip
+                                        .clipped()                               // clips at screen edge
+                                }
                                 
                                 LessonNode(
                                     isUnlocked: isUnlocked,
@@ -108,17 +129,17 @@ struct LearnView: View {
                                         }
                                     }
                                 )
-                                .position(x: pos.x, y: pos.y)
+                                .offset(x: xOffset)
                                 .id(lesson.id)
                             }
+                            .frame(height: 100)
                         }
-                        .frame(height: pathHeight)
                     }
-                    .frame(height: pathHeight)
+                    .padding(.vertical, 40)
                     .onAppear {
                         // Scroll to the active lesson node & focus it
                         if activeIndex < lessonsList.count {
-                            scrollProxy.scrollTo(lessonsList[activeIndex].id, anchor: .center)
+                            scrollProxy.scrollTo(lessonsList[activeIndex].id, anchor: scrollAnchor)
                         }
                     }
                     .onChange(of: manager.activeTopicId) { newTopicId in
@@ -132,7 +153,7 @@ struct LearnView: View {
                         }()
                         if activeIndex < lessons.count {
                             withAnimation {
-                                scrollProxy.scrollTo(lessons[activeIndex].id, anchor: .center)
+                                scrollProxy.scrollTo(lessons[activeIndex].id, anchor: scrollAnchor)
                             }
                         }
                     }
@@ -192,13 +213,72 @@ struct LearnView: View {
     }
     
     // Helpers
-    private func positionForLesson(index: Int, totalHeight: CGFloat, centerX: CGFloat) -> CGPoint {
-        let startY = totalHeight - 80
-        let y = startY - CGFloat(index) * spacing
-        let indexLike = (totalHeight - 80 - y) / spacing
-        let amplitude: CGFloat = 55
-        let xOffset = amplitude * sin(Double(indexLike) * 0.8)
-        return CGPoint(x: centerX + xOffset, y: y)
+    private func animationNameFor(unitIndex: Int, spotIndex: Int) -> String {
+        switch unitIndex + 1 {
+        case 1, 3, 6:
+            // Alternate between singing and flying
+            return spotIndex % 2 == 0 ? "peachysinging" : "peachy_flying"
+        case 2, 4, 5:
+            // Set all spots to use flying for now (easy to change individually later)
+            return "peachy_flying"
+        default:
+            return "peachy_flying"
+        }
+    }
+    
+    private func configForAnimation(name: String, screenWidth: CGFloat) -> LottieAnimationConfig {
+        // Scale from iPhone 15 Pro (393pt) base values that were visually confirmed to work.
+        // Fixed offsetX=115 keeps the character in the comfortable side gap on large screens.
+        // Moving .offset() BEFORE .clipped() means the clip boundary IS the screen edge,
+        // so canvas whitespace that overflows the screen edge is always hidden cleanly.
+        let scale = screenWidth / 393
+
+        // Small-screen adjustments (< 400pt, e.g. iPhone SE, standard iPhone 15):
+        // - 10% smaller size
+        // - Move ~5% of screenWidth closer to path so the outer wing clears the screen edge.
+        //   (Using 5% of screenWidth ~19pt, not 5% of offsetX ~6pt, to get enough clearance.)
+        let isSmallScreen = screenWidth < 400
+        let smallSizeFactor: CGFloat = isSmallScreen ? 0.90 : 1.0
+        // 5% of screenWidth toward center, expressed as a reduction from the 115pt base offset.
+        let smallOffsetX: CGFloat = isSmallScreen ? max(115 - screenWidth * 0.05, 80) : 115
+
+        switch name {
+        case "peachysinging":
+            let animW = 380 * scale * smallSizeFactor
+            let animH = 270 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.930 : 0.930)  // small: crop 2% more to hide black bar (0.950 -> 0.930)
+            return LottieAnimationConfig(
+                name: "peachysinging",
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: smallOffsetX,
+                shadowY: visH * 0.328,
+                shadowWidth: animW * 0.24, shadowHeight: 14
+            )
+
+        case "peachy_flying":
+            let animW = 400 * scale * smallSizeFactor
+            let animH = 212 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.910 : 0.895)  // small: crop 2% more to hide black bar (0.930 -> 0.910)
+            return LottieAnimationConfig(
+                name: "peachy_flying",
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: smallOffsetX,
+                shadowY: visH * 0.455,
+                shadowWidth: animW * 0.18, shadowHeight: 12
+            )
+
+        default:
+            let animW = 320 * scale * smallSizeFactor
+            let animH = 240 * scale * smallSizeFactor
+            let visH  = animH * (isSmallScreen ? 0.930 : 0.930)
+            return LottieAnimationConfig(
+                name: name,
+                width: animW, height: animH, visibleHeight: visH,
+                offsetX: smallOffsetX,
+                shadowY: visH * 0.38,
+                shadowWidth: animW * 0.22, shadowHeight: 14
+            )
+        }
     }
     
     private var activeTopicColor: Color {
@@ -228,4 +308,17 @@ struct LearnView: View {
         case .audience: return "bubble.left.and.bubble.right.fill"
         }
     }
+}
+
+struct LottieAnimationConfig {
+    let name: String
+    let width: CGFloat
+    let height: CGFloat
+    let visibleHeight: CGFloat
+    /// Horizontal distance from the ZStack center to the animation center.
+    /// Computed relative to actual screen width so it scales across devices.
+    let offsetX: CGFloat
+    let shadowY: CGFloat
+    let shadowWidth: CGFloat
+    let shadowHeight: CGFloat
 }
