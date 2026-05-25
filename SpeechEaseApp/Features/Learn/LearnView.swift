@@ -94,17 +94,19 @@ struct LearnView: View {
                             let xOffset = -amplitude * sin(Double(index) * 0.8)
                             
                             ZStack {
-                                // Peachy Singing animation if this is a gap index
+                                // Peachy character animations in the gaps
                                 if index % 4 == 2 {
                                     let direction: CGFloat = sin(Double(index) * 0.8) > 0 ? 1 : -1
+                                    let spotIndex = (index - 2) / 4
+                                    let animName = animationNameFor(unitIndex: topicIndex, spotIndex: spotIndex)
                                     
                                     // Custom ground shadow under the bird
                                     Ellipse()
                                         .fill(Color.black.opacity(0.12))
                                         .frame(width: 80, height: 14)
-                                        .offset(x: direction * 85, y: 92)
+                                        .offset(x: direction * 85, y: 88)
                                     
-                                    LottieView(filename: "peachysinging")
+                                    LottieView(filename: animName)
                                         .frame(width: 350, height: 250)
                                         .allowsHitTesting(false)
                                         .frame(height: 232, alignment: .top)
@@ -207,6 +209,19 @@ struct LearnView: View {
     }
     
     // Helpers
+    private func animationNameFor(unitIndex: Int, spotIndex: Int) -> String {
+        switch unitIndex + 1 {
+        case 1, 3, 6:
+            // Alternate between singing and flying
+            return spotIndex % 2 == 0 ? "peachysinging" : "peachy_flying"
+        case 2, 4, 5:
+            // Set all spots to use flying for now (easy to change individually later)
+            return "peachy_flying"
+        default:
+            return "peachy_flying"
+        }
+    }
+    
     private var activeTopicColor: Color {
         let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
         return colorForTopicType(activeType)
