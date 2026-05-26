@@ -8,26 +8,12 @@ import SwiftUI
 struct LearnView: View {
     @ObservedObject var manager = LearningManager.shared
     
-    @State private var showPathSelector = false
-    @State private var showHeartsRefill = false
     @State private var selectedLesson: Lesson? = nil
     
     private let scrollAnchor = UnitPoint(x: 0.5, y: 0.65)
     
     var body: some View {
         VStack(spacing: 0) {
-            // 1. Top Metrics Header Bar
-            MetricsHeaderView(
-                onSelectTopic: {
-                    showPathSelector = true
-                },
-                onRefillHearts: {
-                    showHeartsRefill = true
-                }
-            )
-            
-            Divider()
-            
             // 2. Unit Banner Header (Colored Section)
             let activeType = TopicType(rawValue: manager.activeTopicId) ?? .structure
             let activeTopic = LearnTopic.sampleTopics.first(where: { $0.id == manager.activeTopicId }) ?? LearnTopic.sampleTopics[0]
@@ -199,12 +185,6 @@ struct LearnView: View {
             .padding(.vertical, 10)
             .background(Color(.secondarySystemBackground))
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: -3)
-        }
-        .sheet(isPresented: $showPathSelector) {
-            PathSelectorView()
-        }
-        .sheet(isPresented: $showHeartsRefill) {
-            HeartsRefillView()
         }
         .fullScreenCover(item: $selectedLesson) { lesson in
             LessonQuizView(lesson: lesson, topicId: manager.activeTopicId, topicColor: activeTopicColor)
