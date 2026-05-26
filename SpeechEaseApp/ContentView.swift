@@ -10,42 +10,64 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var tabOpacity = 1.0
+    
+    @State private var showHeartsRefill = false
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        VStack(spacing: 0) {
+            // Global uniform top bar
+            MetricsHeaderView(
+                onRefillHearts: {
+                    showHeartsRefill = true
+                }
+            )
+            .background(Color("AccentColor").ignoresSafeArea(edges: .top))
+            
+            // Little dark line separator (AccentColor but darker)
+            Rectangle()
+                .frame(height: 1)
+                .foregroundColor(Color("AccentColor"))
+                .overlay(Color.black.opacity(0.25))
+            
+            TabView(selection: $selectedTab) {
 
-            // 1. Learn Tab
-            NavigationStack {
-                LearnView()
-            }
-            .tabItem { Label("Learn", systemImage: "book.fill") }
-            .tag(0)
+                // 1. Learn Tab
+                NavigationStack {
+                    LearnView()
+                }
+                .tabItem { Label("Learn", systemImage: "book.fill") }
+                .tag(0)
 
-            // 2. Practice Tab
-            NavigationStack {
-                PracticeView()
-            }
-            .tabItem { Label("Practice", systemImage: "mic.fill") }
-            .tag(1)
+                // 2. Practice Tab
+                NavigationStack {
+                    PracticeView()
+                }
+                .tabItem { Label("Practice", systemImage: "mic.fill") }
+                .tag(1)
 
-            // 3. Progress Tab
-            NavigationStack {
-                SpeechProgressView()
+                // 3. Progress Tab
+                NavigationStack {
+                    SpeechProgressView()
+                }
+                .tabItem { Label("Progress", systemImage: "chart.bar.xaxis") }
+                .tag(2)
             }
-            .tabItem { Label("Progress", systemImage: "chart.bar.xaxis") }
-            .tag(2)
-        }
-        .tint(.orange)
-        .opacity(tabOpacity)
-        .onChange(of: selectedTab) { _ in
-            withAnimation(.easeIn(duration: 0.12)) {
-                tabOpacity = 0
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                withAnimation(.easeOut(duration: 0.22)) {
-                    tabOpacity = 1
+            .tint(.orange)
+            .opacity(tabOpacity)
+            .onChange(of: selectedTab) { _ in
+                withAnimation(.easeIn(duration: 0.12)) {
+                    tabOpacity = 0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    withAnimation(.easeOut(duration: 0.22)) {
+                        tabOpacity = 1
+                    }
                 }
             }
+        }
+        }
+        .sheet(isPresented: $showHeartsRefill) {
+            HeartsRefillView()
         }
     }
 }
