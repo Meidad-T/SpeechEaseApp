@@ -67,7 +67,6 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        }
         .sheet(isPresented: $showHeartsRefill) {
             HeartsRefillView()
         }
