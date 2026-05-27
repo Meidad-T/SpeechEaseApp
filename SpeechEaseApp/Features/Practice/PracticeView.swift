@@ -10,6 +10,7 @@ import SwiftUI
 struct PracticeView: View {
     @State private var selectedTopic: PracticeTopic = .structure
     @State private var showSession = false
+    @State private var isVisible = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -46,6 +47,19 @@ struct PracticeView: View {
             .background(Color(UIColor.systemGroupedBackground))
         }
         .ignoresSafeArea(edges: .top)
+        .opacity(isVisible ? 1 : 0)
+        .onAppear {
+            // Wait for full render pass to complete, then show
+            DispatchQueue.main.async {
+                DispatchQueue.main.async {
+                    isVisible = true
+                }
+            }
+        }
+        .onDisappear {
+            // Reset so it loads cleanly next time too
+            isVisible = false
+        }
         .fullScreenCover(isPresented: $showSession) {
             PracticeSessionView(topic: selectedTopic, onDismiss: {
                 showSession = false
@@ -53,7 +67,6 @@ struct PracticeView: View {
             .background(Color.black)
         }
         .transaction { transaction in
-            // Replace the default sheet slide with a fade
             transaction.animation = .easeInOut(duration: 0.35)
         }
     }
