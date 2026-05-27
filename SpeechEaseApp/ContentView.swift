@@ -70,6 +70,9 @@ struct ContentView: View {
         .sheet(isPresented: $showHeartsRefill) {
             HeartsRefillView()
         }
+        .sheet(isPresented: $showHeartsRefill) {
+            HeartsRefillView()
+        }
     }
 }
 
