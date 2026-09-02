@@ -132,6 +132,7 @@ struct PracticeSessionView: View {
             }
             .fullScreenCover(isPresented: $showAudioRecorder) {
                 LiveSessionView(
+                    timeLimitSeconds: session.enforceTimeLimit ? Double(session.timeLimitMinutes ?? 0) * 60.0 : nil,
                     onFinish: { result in
                         showAudioRecorder = false
                         handleRecordingResult(result)
@@ -142,7 +143,10 @@ struct PracticeSessionView: View {
                 )
             }
             .fullScreenCover(isPresented: $showVideoRecorder) {
-                CameraRecordingSheet(externalAnalysisStatus: $analysisStatus) { result in
+                CameraRecordingSheet(
+                    externalAnalysisStatus: $analysisStatus,
+                    timeLimitSeconds: session.enforceTimeLimit ? Double(session.timeLimitMinutes ?? 0) * 60.0 : nil
+                ) { result in
                     handleRecordingResult(result)
                 }
             }
@@ -923,50 +927,52 @@ struct RecordLiveActionCard: View {
     let session: PracticeSession
     let requiresVideo: Bool
     @State private var animate = false
-    
+
     private var isIPad: Bool {
         UIDevice.current.userInterfaceIdiom == .pad
     }
-    
+
     var body: some View {
+        let radius: CGFloat = isIPad ? 30 : 20
+
         ZStack(alignment: .bottom) {
-            RoundedRectangle(cornerRadius: isIPad ? 30 : 20)
-                .fill(.black)
-            
-            VStack {
-                Spacer()
-                AnimatedGlowWaveView()
-                    .frame(height: isIPad ? 60 : 45)
-                    .opacity(0.9)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: isIPad ? 30 : 20))
-            
-            RoundedRectangle(cornerRadius: isIPad ? 30 : 20)
-                .fill(
+            Color.black
+
+            // Wave with gradient mask — no hard clip edge
+            AnimatedGlowWaveView()
+                .frame(height: isIPad ? 140 : 110)
+                .mask(
                     LinearGradient(
-                        colors: [
-                            Color(red: 1.0, green: 0.5, blue: 0.0).opacity(0.3),
-                            .clear
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        colors: [.clear, .black.opacity(0.5), .black],
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
                 )
-            
-            GeometryReader { geo in
-                HStack {
-                    Spacer()
-                    Image(systemName: requiresVideo ? "figure.stand" : "mic.fill")
-                        .font(.system(size: isIPad ? 250 : 160))
-                        .foregroundStyle(.white)
-                        .opacity(0.12)
-                        .offset(x: isIPad ? 40 : 20, y: isIPad ? 20 : 10)
-                        .scaleEffect(animate ? 1.05 : 1.0)
-                        .animation(.easeInOut(duration: 3).repeatForever(autoreverses: true), value: animate)
-                }
+                .opacity(0.85)
+
+            // Orange gradient accent
+            LinearGradient(
+                colors: [
+                    Color(red: 1.0, green: 0.5, blue: 0.0).opacity(0.22),
+                    .clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            // Decorative icon
+            HStack {
+                Spacer()
+                Image(systemName: requiresVideo ? "figure.stand" : "mic.fill")
+                    .font(.system(size: isIPad ? 250 : 160))
+                    .foregroundStyle(.white)
+                    .opacity(0.1)
+                    .offset(x: isIPad ? 40 : 20, y: isIPad ? 20 : 10)
+                    .scaleEffect(animate ? 1.05 : 1.0)
+                    .animation(.easeInOut(duration: 3).repeatForever(autoreverses: true), value: animate)
             }
-            .clipShape(RoundedRectangle(cornerRadius: isIPad ? 30 : 20))
-            
+
+            // Text content
             HStack {
                 VStack(alignment: .leading, spacing: isIPad ? 10 : 4) {
                     HStack(spacing: 8) {
@@ -980,21 +986,21 @@ struct RecordLiveActionCard: View {
                     .padding(.vertical, isIPad ? 6 : 4)
                     .background(.white.opacity(0.25), in: Capsule())
                     .foregroundStyle(.white)
-                    
+
                     Text("Record Live")
                         .font(.system(size: isIPad ? 36 : 28, weight: .bold))
                         .foregroundStyle(.white)
                         .shadow(color: .black.opacity(0.3), radius: 3)
-                    
+
                     Text(requiresVideo ? "Analyze body language & speech" : "Analyze vocal tone & clarity")
                         .font(isIPad ? .title3 : .subheadline)
                         .fontWeight(.medium)
                         .foregroundStyle(.white.opacity(0.95))
                         .shadow(color: .black.opacity(0.2), radius: 2)
                         .padding(.top, isIPad ? 4 : 2)
-                    
+
                     Spacer()
-                    
+
                     HStack {
                         Text("Start Session")
                             .fontWeight(.bold)
@@ -1012,11 +1018,12 @@ struct RecordLiveActionCard: View {
                     .padding(.bottom, isIPad ? 0 : 5)
                 }
                 .padding(isIPad ? 30 : 20)
-                
+
                 Spacer()
             }
         }
         .frame(height: isIPad ? 240 : 180)
+        .clipShape(RoundedRectangle(cornerRadius: radius))
         .shadow(color: Color(red: 1.0, green: 0.6, blue: 0.1).opacity(0.5), radius: isIPad ? 20 : 15, y: isIPad ? 10 : 6)
         .onAppear {
             animate = true

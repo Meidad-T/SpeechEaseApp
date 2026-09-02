@@ -4,8 +4,11 @@ struct CreatePracticeSessionView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: CreateSessionViewModel
     var onSave: (PracticeSession) -> Void
-    
+
     private let isEditing: Bool
+
+    @FocusState private var isNameFocused: Bool
+    @FocusState private var isTimeLimitFocused: Bool
     
     init(sessionToEdit: PracticeSession? = nil, onSave: @escaping (PracticeSession) -> Void) {
         self._viewModel = StateObject(wrappedValue: CreateSessionViewModel(sessionToEdit: sessionToEdit))
@@ -82,6 +85,19 @@ struct CreatePracticeSessionView: View {
                 }
             }
             .background(Color(UIColor.systemGroupedBackground))
+            .onChange(of: viewModel.currentStep) { _, newStep in
+                switch newStep {
+                case .focus:
+                    isNameFocused = false
+                    isTimeLimitFocused = false
+                case .config:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        isTimeLimitFocused = true
+                    }
+                default:
+                    break
+                }
+            }
         }
         .onAppear {
             if !isEditing {
@@ -98,6 +114,7 @@ struct CreatePracticeSessionView: View {
                 .padding(.top)
             
             TextField("Session Name (e.g., Morning Warmup)", text: $viewModel.sessionName)
+                .focused($isNameFocused)
                 .padding()
                 .background(Color.adaptiveCardBackground)
                 .cornerRadius(12)
@@ -243,6 +260,7 @@ struct CreatePracticeSessionView: View {
                 
                 TextField("e.g. 10", text: $viewModel.timeLimitText)
                     .keyboardType(.numberPad)
+                    .focused($isTimeLimitFocused)
                     .padding()
                     .background(Color.adaptiveCardBackground)
                     .cornerRadius(12)
@@ -258,7 +276,7 @@ struct CreatePracticeSessionView: View {
                         Text("Enforce time limit?")
                             .font(.body)
                             .fontWeight(.medium)
-                        Text("Your practice sessions will be timed to ensure you don't exceed the time limit you set")
+                        Text("Your session will be cut right at the limit — you better stick to it!")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
